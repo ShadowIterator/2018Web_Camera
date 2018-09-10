@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Video</title>
+    <script src="https://cdn.bootcss.com/jquery/1.10.2/jquery.min.js"></script>
+</head>
+<script>
+    function refresh() {
+        $.ajax({
+            data:{'csrfmiddlewaretoken':$("input[name='csrfmiddlewaretoken']").attr("value")},
+            type:"post",
+			//dataType: 'jsonp',
+            url:"http://localhost:8000/video/refresh/",
+            //timeout:1000,
+            success:function(datas){
+                $("#Image").attr("src","data:image/png;base64,"+datas);
+                console.log($("#Image").attr("width"))
+            },
+            error:function () {
+                clearInterval()
+            }
+            });
+    }
+    setInterval(refresh,100)
+
+</script>
+<body>
+
+    <div>
+        {% csrf_token %}
+
+    </div>
+    <div>
+        <img id="Image" alt="Base64 encoded image" width="640" height="480">
+    </div>
+
+</body>
+
+</html>
