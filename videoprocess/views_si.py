@@ -63,3 +63,10 @@ def playVideo(request, fileName):
     print('playVideo called')
     return StreamingHttpResponse(genCamera(cap), content_type='multipart/x-mixed-replace;boundary=myboundary')
 #    return StreamingHttpResponse(genHtml())
+
+def websocket(request):
+	return render(request,
+		  'websocket.html',
+		  {
+		  }
+		  )

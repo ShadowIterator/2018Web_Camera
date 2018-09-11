@@ -13,5 +13,6 @@ urlpatterns=[
     path('logout/', views.log_out),
     path('manage/', views.manage_user),
     path('delete', views.delete_user),
-    path('add', views.add_user)
+    path('add', views.add_user),
+	path('websocket/', views_si.websocket, name = 'websocket')
 ]

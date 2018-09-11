@@ -103,3 +103,5 @@ def add_user(request):
         usr_password=request.POST.get('password')
         User.objects.create_user(username=usr_name, password=usr_password)
         return redirect('/video/manage')
+
+		
