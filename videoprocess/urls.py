@@ -1,13 +1,14 @@
 from django.urls import path,re_path
 from . import views
+from . import views_si
 
 urlpatterns=[
     path('refresh/', views.show_frame),
     path('signup/', views.sign_up),
-    path('mjpeg/', views.mjpeg),
-	path('welcome/', views.welcome),
-	path('play/', views.playSaiki),
-	re_path('play/(?P<fileName>.+)', views.playVideo),
+    path('mjpeg/', views_si.mjpeg),
+	path('welcome/', views_si.welcome),
+	path('play/', views_si.playSaiki),
+	re_path('play/(?P<fileName>.+)', views_si.playVideo),
     path('login/', views.log_in),
     path('logout/', views.log_out),
     path('manage/', views.manage_user),
