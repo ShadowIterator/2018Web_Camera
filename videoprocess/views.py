@@ -12,7 +12,7 @@ import time
 
 
 # Create your views here.
-cap=cv2.VideoCapture(0)
+#cap=cv2.VideoCapture(0)
 #cap = cv2.VideoCapture(0)
 
 def start_camera():
@@ -20,21 +20,21 @@ def start_camera():
     cv2.imwrite('frame.png', frame)
 
 
-def show_frame(request):
-    if request.method=='GET':
-        return render(request,'index.html')
-    elif request.method=='POST':
-        global cap
-        ret, frame = cap.read()
-        # np_array = np.fromstring(frame, np.uint8)
-        # img_np=cv2.imdecode(np_array, cv2.IMREAD_COLOR)
-
-#        recognized_image=recognition.emotion_recognize(frame)
-#        image = cv2.imencode('.png', recognized_image)[1]
-        image = cv2.imencode('.png', frame)[1]
-        response = HttpResponse(str(base64.b64encode(image))[2:-1])
-        response['Access-Control-Allow-Origin'] = '*'
-        return response
+# def show_frame(request):
+#     if request.method=='GET':
+#         return render(request,'index.html')
+#     elif request.method=='POST':
+#         global cap
+#         ret, frame = cap.read()
+#         # np_array = np.fromstring(frame, np.uint8)
+#         # img_np=cv2.imdecode(np_array, cv2.IMREAD_COLOR)
+#
+# #        recognized_image=recognition.emotion_recognize(frame)
+# #        image = cv2.imencode('.png', recognized_image)[1]
+#         image = cv2.imencode('.png', frame)[1]
+#         response = HttpResponse(str(base64.b64encode(image))[2:-1])
+#         response['Access-Control-Allow-Origin'] = '*'
+#         return response
 def sign_up(request):
     if request.method=='GET':
 
@@ -69,7 +69,7 @@ def log_in(request):
             if possible_user.check_password(usr_password):
                 request.session['logstate']='logged'
                 request.session['usrname']=usr_name
-                return redirect('/video/refresh')
+                return redirect('/video/info')
             else:
                 instruction='密码不正确，请重新登录'
                 return render(request, 'login.html', {'instruction':instruction})

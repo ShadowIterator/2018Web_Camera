@@ -27,6 +27,8 @@ def welcome(request):
 def genCamera(fileName, sharedVar, recognizer):
     # count = 1
     vcap = videocap.VideoCap(fileName)
+
+    last_emotion=''
     recognizer.start()
     while(True):
         if(not vcap.opened):
@@ -40,20 +42,39 @@ def genCamera(fileName, sharedVar, recognizer):
         if(not ret):
             return
 
+        if(tconsumers.web_skt is None):
+            print('gen returned')
+            return
         # np_array = np.fromstring(frame, np.uint8)
         # img_np=cv2.imdecode(np_array, cv2.IMREAD_COLOR)
 
         # results = recognition.emotion_recognize(frame)
         results = sharedVar.res
 
+        info_returned = ''
+
         for result in results:
             result.drawToImage(frame)
+            info_returned += result.emotion_res+' '
+
+        if len(results) == 1:
+            if last_emotion == results[0].emotion_res:
+                info_returned = ''
+            else:
+                last_emotion = results[0].emotion_res
+        else:
+            last_emotion=''
+
+        if tconsumers.started:
+            tconsumers.web_skt.send(info_returned)
+
 
         image = cv2.imencode('.jpg', frame)[1]
         chunkheader = b"Content-Type: image/jpeg\nContent-Length: " + str(len(image)).encode('ascii') + b"\n\n"
         boundary = b"\n--myboundary\n"
         yield (chunkheader + bytearray(image) + boundary)
-        time.sleep(0.01)
+        time.sleep(0.05)
+
 
 def mjpeg(request):
     print('mjpeg called')
@@ -62,6 +83,7 @@ def mjpeg(request):
 def recognizer_function(sharedVar):
     while True:
         sharedVar.setRes(recognition.emotion_recognize(sharedVar.img))
+        time.sleep(0.05)
 
 def playVideo(request, fileName):
     # cap = videocap.VideoCap(fileName)
@@ -69,8 +91,9 @@ def playVideo(request, fileName):
     # return StreamingHttpResponse(genCamera(cap), content_type='multipart/x-mixed-replace;boundary=myboundary')
     sharedVar = mp.sharedVar()
     recognizer = threading.Thread(target = recognizer_function, args = (sharedVar,))
-    trd = threading.Thread(target = giveMsg, args = (0,))
-    trd.start()
+
+    # trd = threading.Thread(target = giveMsg, args = (0,))
+    # trd.start()
     return StreamingHttpResponse(genCamera(fileName, sharedVar, recognizer),  content_type='multipart/x-mixed-replace;boundary=myboundary')
 
 def releaseCap(request):
@@ -80,7 +103,6 @@ def releaseCap(request):
 
 def giveMsg(x):
     while True:
-        print(tconsumers.started)
         if(tconsumers.started):
             tconsumers.web_skt.send('websocket')
         time.sleep(0.7)
@@ -90,4 +112,15 @@ def websocket(request):
     trd = threading.Thread(target = giveMsg, args = (0,))
     trd.start()
     return render(request, 'websocket.html',{})
+
+def infotest(request):
+    if request.method == 'GET':
+        usr_name = ''
+        super_user = 'hidden'
+        if request.session.get('logstate') == 'logged':
+            usr_name = request.session.get('usrname')
+            usr = User.objects.get(username=usr_name)
+            if usr.is_superuser:
+                super_user = ''
+        return render(request, 'info.html', {'usr_name': usr_name, 'super_user': super_user})
 

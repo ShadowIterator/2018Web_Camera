@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.bootcss.com/jquery/1.10.2/jquery.min.js"></script>
+
+	<script type="text/javascript">
+         function WebSocketTest()
+         {
+            if ("WebSocket" in window)
+            {
+               console.log("WebSocket supported!");
+
+               ws = new WebSocket("ws://localhost:8000/ws/info/");
+
+               ws.onopen = function()
+               {
+                  ws.send("hellox");
+                  console.log("emitting");
+               };
+
+               ws.onmessage = function (evt)
+               {
+                   let infoArea=document.getElementById("info");
+                   infoArea.innerHTML=""
+                   let infoList=evt.data.split(" ");
+                   infoList.pop();
+                   for (var i=0; i<infoList.length; i++)
+                   {
+                       let para=document.createElement("p")
+                       let single_info=document.createTextNode(infoList[i])
+                       para.appendChild(single_info)
+                       infoArea.appendChild(para)
+                   }
+               };
+
+               ws.onclose = function()
+               {
+                  console.log("closed");
+               };
+            }
+
+            else
+            {
+               console.log("WebSocket failed");
+            }
+         }
+
+    </script>
+    <script>
+        $(document).ready(function () {
+            WebSocketTest();
+        })
+    </script>
+
+</head>
+
+<body>
+    <p>welcome, {{ usr_name }}</p>
+    <button onclick="window.location.href='/video/logout'">logout</button>
+    <button {{ super_user }} onclick="window.location.href='/video/manage'">管理</button>
+    <div>
+		<img src = 'http://127.0.0.1:8000/video/play/camera' style="width: 960px;" />
+	</div>
+
+    <div id="sse">
+         <a href="javascript:WebSocketTest()">WebSocket</a>
+    </div>
+
+    <div id="info">
+
+    </div>
+</body>
+</html>

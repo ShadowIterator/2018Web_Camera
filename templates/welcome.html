@@ -46,25 +46,16 @@
     <div>
         <h1> {{testvar}} </h1>
     </div>
-<!--------
+
 	<div>
 		<img src = 'http://127.0.0.1:8000/video/play/camera' />
 	</div>
---------------->
+
 	<div id="sse">
          <a href="javascript:WebSocketTest()">WebSocket</a>
     </div>
-	
-	<div id="loginForm">
-	<form action="http://127.0.0.1:8000/video/welcome/" method="post">
-	{% csrf_token %}
-	<p>user name <input type="text" name="userName" /></p>
-		<p>password <input type="password" name="password" /></p>
-	<input type="submit" value="Submit" />
-	</form>
 
-	
-	</div>
+
 </body>
 
 </html>
