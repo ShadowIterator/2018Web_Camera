@@ -78,6 +78,5 @@ def releaseCap(request):
 def websocket(request):
 	return render(request,
 		  'websocket.html',
-		  {
-		  }
+		  {}
 		  )
