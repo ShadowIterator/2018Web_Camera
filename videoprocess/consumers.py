@@ -1,11 +1,19 @@
 # chat/consumers.py
 from channels.generic.websocket import WebsocketConsumer
 import json
+from . import tconsumers
+
+
 
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
         self.accept()
         self.count = 1
+        global web_skt
+        global started
+        tconsumers.web_skt = self
+        tconsumers.started = True
+
     def disconnect(self, close_code):
         pass
 
@@ -20,5 +28,5 @@ class ChatConsumer(WebsocketConsumer):
         print('---------------\n' + text_data)
         self.send('hello!' + str(self.count))
         self.count += 1
-        if(self.count == 20):
-            self.close()
+        # if(self.count == 20):
+        #     self.close()

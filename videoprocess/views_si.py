@@ -11,6 +11,7 @@ from . import recognition
 from . import videocap
 import time
 from . import mp
+from . import tconsumers
 
 # global glb_cap
 
@@ -22,7 +23,7 @@ def genHtml():
 
 def welcome(request):
     return render(request,'welcome.html',{'testvar': 'welcome'})
-		
+
 def genCamera(fileName, sharedVar, recognizer):
     # count = 1
     vcap = videocap.VideoCap(fileName)
@@ -68,6 +69,8 @@ def playVideo(request, fileName):
     # return StreamingHttpResponse(genCamera(cap), content_type='multipart/x-mixed-replace;boundary=myboundary')
     sharedVar = mp.sharedVar()
     recognizer = threading.Thread(target = recognizer_function, args = (sharedVar,))
+    trd = threading.Thread(target = giveMsg, args = (0,))
+    trd.start()
     return StreamingHttpResponse(genCamera(fileName, sharedVar, recognizer),  content_type='multipart/x-mixed-replace;boundary=myboundary')
 
 def releaseCap(request):
@@ -75,8 +78,16 @@ def releaseCap(request):
     # glb_cap.release()
     return render(request, 'login.html')
 
+def giveMsg(x):
+    while True:
+        print(tconsumers.started)
+        if(tconsumers.started):
+            tconsumers.web_skt.send('websocket')
+        time.sleep(0.7)
+
 def websocket(request):
-	return render(request,
-		  'websocket.html',
-		  {}
-		  )
+
+    trd = threading.Thread(target = giveMsg, args = (0,))
+    trd.start()
+    return render(request, 'websocket.html',{})
+
