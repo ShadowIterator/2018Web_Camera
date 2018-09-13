@@ -25,9 +25,11 @@
                    let infoArea=document.getElementById("info");
                    infoArea.innerHTML=""
                    let infoList=evt.data.split(" ");
-                   infoList.pop();
+
                    for (var i=0; i<infoList.length; i++)
                    {
+                       if (infoList[i]=="")
+                           continue;
                        let para=document.createElement("p")
                        let single_info=document.createTextNode(infoList[i])
                        para.appendChild(single_info)
@@ -60,6 +62,7 @@
     <p>welcome, {{ usr_name }}</p>
     <button onclick="window.location.href='/video/logout'">logout</button>
     <button {{ super_user }} onclick="window.location.href='/video/manage'">管理</button>
+    <button {{ super_user }} onclick="window.location.href='/video/records'">历史记录</button>
     <div>
 		<img src = 'http://127.0.0.1:8000/video/play/camera' style="width: 960px;" />
 	</div>

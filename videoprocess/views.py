@@ -108,3 +108,15 @@ def add_user(request):
 def manage_record(request):
     if request.method=='GET':
         all_records=message.objects.all()
+        return render(request, 'record.html', {'records':all_records})
+
+def del_record(request):
+    if request.method=='POST':
+        if request.POST.get('single_del'):
+            for single_record in message.objects.all():
+               if request.POST.get(str(single_record.id)):
+                   single_record.delete()
+        elif request.POST.get('del_all'):
+            for single_record in message.objects.all():
+                single_record.delete()
+        return redirect('/video/records')

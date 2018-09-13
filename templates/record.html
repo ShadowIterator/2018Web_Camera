@@ -2,9 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>历史记录</title>
 </head>
 <body>
-
+     <form action="/video/delrecord" method="post">
+        {% csrf_token %}
+        <p>请选择要删除记录</p>
+         {% for record in records %}
+        <div>
+            <p>{{ record.time }}   {{ record.info }}<input type="checkbox" name="{{ record.id }}"></p>
+        </div>
+        {% endfor %}
+        <input type="submit" value="删除" name="single_del">
+        <input type="submit" value="全部删除" name="del_all">
+     </form>
+    <button onclick="window.location.href='/video/info'">返回</button>
 </body>
 </html>

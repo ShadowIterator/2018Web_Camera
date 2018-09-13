@@ -69,7 +69,8 @@ def genCamera(fileName, sharedVar, recognizer):
 
         if tconsumers.started:
             current_time=datetime.datetime.now()
-            message.objects.create(time=current_time, info=info_returned)
+            if info_returned!='':
+                message.objects.create(time=current_time, info=info_returned)
             tconsumers.web_skt.send(info_returned)
 
 

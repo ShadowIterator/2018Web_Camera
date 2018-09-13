@@ -17,5 +17,6 @@ urlpatterns=[
     path('websocket/', views_si.websocket, name = 'websocket'),
     path('releaseCap/', views_si.releaseCap, name = 'releaseCap'),
     path('info/', views_si.infotest),
-    path('records/', )
+    path('records/', views.manage_record),
+    path('delrecord',views.del_record)
 ]
