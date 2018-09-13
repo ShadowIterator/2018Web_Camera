@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import threading
 import base64
+import datetime
 from django.http import HttpResponse, StreamingHttpResponse
 from django.shortcuts import redirect
 from django.contrib.auth.models import User
@@ -12,6 +13,7 @@ from . import videocap
 import time
 from . import mp
 from . import tconsumers
+from .models import message
 
 # global glb_cap
 
@@ -66,6 +68,8 @@ def genCamera(fileName, sharedVar, recognizer):
             last_emotion=''
 
         if tconsumers.started:
+            current_time=datetime.datetime.now()
+            message.objects.create(time=current_time, info=info_returned)
             tconsumers.web_skt.send(info_returned)
 
 

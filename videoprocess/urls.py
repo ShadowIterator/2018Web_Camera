@@ -16,5 +16,6 @@ urlpatterns=[
     path('add', views.add_user),
     path('websocket/', views_si.websocket, name = 'websocket'),
     path('releaseCap/', views_si.releaseCap, name = 'releaseCap'),
-    path('info/', views_si.infotest)
+    path('info/', views_si.infotest),
+    path('records/', )
 ]

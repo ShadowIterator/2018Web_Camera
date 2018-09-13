@@ -8,6 +8,7 @@ from django.http import HttpResponse, StreamingHttpResponse
 from django.shortcuts import redirect
 from django.contrib.auth.models import User
 from . import recognition
+from .models import message
 import time
 
 
@@ -104,4 +105,6 @@ def add_user(request):
         User.objects.create_user(username=usr_name, password=usr_password)
         return redirect('/video/manage')
 
-		
+def manage_record(request):
+    if request.method=='GET':
+        all_records=message.objects.all()
