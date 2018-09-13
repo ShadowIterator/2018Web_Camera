@@ -4,6 +4,41 @@
     <meta charset="UTF-8">
     <title>Video</title>
     <script src="https://cdn.bootcss.com/jquery/1.10.2/jquery.min.js"></script>
+	<script type="text/javascript">
+         function WebSocketTest()
+         {
+            if ("WebSocket" in window)
+            {
+               console.log("WebSocket supported!");
+
+               ws = new WebSocket("ws://localhost:8000/ws/test/");
+
+               ws.onopen = function()
+               {
+                  ws.send("hellox");
+                  console.log("emitting");
+               };
+
+               ws.onmessage = function (evt)
+               {
+                  var received_msg = evt.data;
+                  console.log("receive done");
+                  console.log("data: "+received_msg)
+				  setTimeout(function(){ws.send('helloy');}, 2000);
+				};
+
+               ws.onclose = function()
+               {
+                  console.log("closed");
+               };
+            }
+
+            else
+            {
+               console.log("WebSocket failed");
+            }
+         }
+      </script>
 </head>
 
 <body>
@@ -11,8 +46,24 @@
     <div>
         <h1> {{testvar}} </h1>
     </div>
+<!--------
 	<div>
 		<img src = 'http://127.0.0.1:8000/video/play/camera' />
+	</div>
+--------------->
+	<div id="sse">
+         <a href="javascript:WebSocketTest()">WebSocket</a>
+    </div>
+	
+	<div id="loginForm">
+	<form action="http://127.0.0.1:8000/video/welcome/" method="post">
+	{% csrf_token %}
+	<p>user name <input type="text" name="userName" /></p>
+		<p>password <input type="password" name="password" /></p>
+	<input type="submit" value="Submit" />
+	</form>
+
+	
 	</div>
 </body>
 
