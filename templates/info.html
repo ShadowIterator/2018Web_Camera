@@ -16,9 +16,22 @@
 
                ws.onopen = function()
                {
-                  ws.send("hellox");
                   console.log("emitting");
-               };
+					
+				  setTimeout(function(){
+				  	let img = document.createElement('img');
+					img.width = 960;
+					img.src = 'http://127.0.0.1:8000/video/play/camera';
+					let cter = document.getElementById('video');
+					cter.appendChild(img)
+					console.log('appenddone')
+				  }, 300);
+				  
+				  session_id = document.getElementById("session_id").innerText;
+				  console.log(session_id);
+                  setTimeout("ws.send(session_id);", 500)
+				 // ws.send(session_id);
+			   };
 
                ws.onmessage = function (evt)
                {
@@ -60,19 +73,34 @@
 
 <body>
     <p>welcome, {{ usr_name }}</p>
+	
+	<form action="http://127.0.0.1:8000/video/resetpwd" method="post">
+        {% csrf_token %}
+        <p>oldPassword<input type="password" name="oldpwd"></p>
+        <p>newPassword<input type="password" name="newpwd"></p>
+		<p>repeat newPassword<input type="password" name="rptnewpwd"></p>
+        <input type="submit" value="reset password">
+    </form>
+	<p> {{resetpwd_result}} </p>
+	
     <button onclick="window.location.href='/video/logout'">logout</button>
     <button {{ super_user }} onclick="window.location.href='/video/manage'">管理</button>
     <button {{ super_user }} onclick="window.location.href='/video/records'">历史记录</button>
-    <div>
-		<img src = 'http://127.0.0.1:8000/video/play/camera' style="width: 960px;" />
+
+	<div id = 'video'>
+
 	</div>
 
-    <div id="sse">
-         <a href="javascript:WebSocketTest()">WebSocket</a>
-    </div>
-
+<!-------------
+	<div>
+		<img src = 'http://127.0.0.1:8000/video/play/rtsp://admin:admin@59.66.68.38:554/cam/realmonitor{\questionmark}channel=1&subtype=0' style='width: 960px'>
+	</div>
+------------->	
     <div id="info">
 
     </div>
+
+	<p id = 'session_id'> {{session_id}}</p>
+
 </body>
 </html>

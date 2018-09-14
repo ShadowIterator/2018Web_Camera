@@ -26,8 +26,10 @@ def genHtml():
 def welcome(request):
     return render(request,'welcome.html',{'testvar': 'welcome'})
 
-def genCamera(fileName, sharedVar, recognizer):
+def genCamera(fileName, sharedVar, recognizer, sessionID):
     # count = 1
+    fileName = fileName.replace('{/questionmark}', '?')
+    print(fileName)
     vcap = videocap.VideoCap(fileName)
 
     last_emotion=''
@@ -43,8 +45,8 @@ def genCamera(fileName, sharedVar, recognizer):
         if(not ret):
             return
 
-        if(tconsumers.web_skt is None):
-            print('gen returned')
+        if(tconsumers.seek_socket(sessionID) == 'NOTFOUND'):
+            print('gen notfound')
             return
 
         results = sharedVar.res
@@ -63,12 +65,15 @@ def genCamera(fileName, sharedVar, recognizer):
         else:
             last_emotion=''
 
-        if tconsumers.started:
+        socket = tconsumers.seek_socket(sessionID)
+
+        if socket != 'UNKNOWN':
             current_time=datetime.datetime.now()
             if info_returned!='':
                 message.objects.create(time=current_time, info=info_returned)
-            tconsumers.web_skt.send(info_returned)
-
+            socket.send(info_returned)
+        else:
+            print('gen unkwon')
 
         image = cv2.imencode('.jpg', frame)[1]
         chunkheader = b"Content-Type: image/jpeg\nContent-Length: " + str(len(image)).encode('ascii') + b"\n\n"
@@ -81,20 +86,30 @@ def mjpeg(request):
     print('mjpeg called')
     return StreamingHttpResponse(genCamera(), content_type='multipart/x-mixed-replace;boundary=myboundary')
 
-def recognizer_function(sharedVar):
+def recognizer_function(sharedVar, sessionID):
     while True:
         # print('recognizing')
-        sharedVar.setRes(recognition.emotion_recognize(sharedVar.img))
-        if(tconsumers.web_skt is None):
+        socket = tconsumers.seek_socket(sessionID)
+        if(socket == 'NOTFOUND'):
+            print('recg, notfound')
             return
+        if(socket != 'UNKNOWN'):
+            sharedVar.setRes(recognition.emotion_recognize(sharedVar.img))
+        else:
+            print('recg, unknown')
         time.sleep(0.05)
 
 def playVideo(request, fileName):
+    sessionID = request.session.session_key
+    if(tconsumers.seek_socket(sessionID) != 'NOTFOUND'):
+        return HttpResponse(status = 403)
+    else:
+        tconsumers.declare_socket(sessionID)
 
     sharedVar = mp.sharedVar()
-    recognizer = threading.Thread(target = recognizer_function, args = (sharedVar,))
+    recognizer = threading.Thread(target = recognizer_function, args = (sharedVar, sessionID))
 
-    return StreamingHttpResponse(genCamera(fileName, sharedVar, recognizer),  content_type='multipart/x-mixed-replace;boundary=myboundary')
+    return StreamingHttpResponse(genCamera(fileName, sharedVar, recognizer, sessionID),  content_type='multipart/x-mixed-replace;boundary=myboundary')
 
 def releaseCap(request):
     print ('released!')
@@ -113,6 +128,10 @@ def websocket(request):
     return render(request, 'websocket.html',{})
 
 def infotest(request):
+    # sessionID = request.session.session_key
+    # if(tconsumers.seek_socket(sessionID) != 'NOTFOUND'):
+    #     return HttpResponse(status = 403)
+
     if request.method == 'GET':
         usr_name = ''
         super_user = 'hidden'
@@ -121,7 +140,30 @@ def infotest(request):
             usr = User.objects.get(username=usr_name)
             if usr.is_superuser:
                 super_user = ''
-            return render(request, 'info.html', {'usr_name': usr_name, 'super_user': super_user})
+            return render(request, 'info.html', {'usr_name': usr_name, 'super_user': super_user, 'session_id': str(request.session.session_key)})
         else:
             return HttpResponse(status=403)
+
+def resetPwd(request):
+    sessionID = request.session.session_key
+
+    usr_name = request.session.get('usrname')
+    usr = User.objects.get(username = usr_name)
+    oldPwd = request.POST.get('oldpwd')
+    newPwd = request.POST.get('newpwd')
+    rptnewPwd = request.POST.get('rptnewpwd')
+    super_user = 'hidden'
+    if usr.is_superuser:
+        super_user = ''
+    if(usr.check_password(oldPwd)):
+        if(newPwd == rptnewPwd):
+            usr.set_password(newPwd)
+            usr.save()
+            print(newPwd)
+            return render(request, 'info.html', {'usr_name': usr_name, 'super_user': super_user, 'resetpwd_result': 'reset password success', 'session_id': str(request.session.session_key)})
+        else:
+            return render(request, 'info.html', {'usr_name': usr_name, 'super_user': super_user, 'resetpwd_result': '两次输入的密码不一样', 'session_id': str(request.session.session_key)})
+    else:
+        return render(request, 'info.html',
+                      {'usr_name': usr_name, 'super_user': super_user, 'resetpwd_result': '密码错误', 'session_id': str(request.session.session_key)})
 

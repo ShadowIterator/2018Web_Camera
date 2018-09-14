@@ -70,6 +70,7 @@ def log_in(request):
             if possible_user.check_password(usr_password):
                 request.session['logstate']='logged'
                 request.session['usrname']=usr_name
+                request.session.set_expiry(0)
                 return redirect('/video/info')
             else:
                 instruction='密码不正确，请重新登录'
