@@ -121,5 +121,7 @@ def infotest(request):
             usr = User.objects.get(username=usr_name)
             if usr.is_superuser:
                 super_user = ''
-        return render(request, 'info.html', {'usr_name': usr_name, 'super_user': super_user})
+            return render(request, 'info.html', {'usr_name': usr_name, 'super_user': super_user})
+        else:
+            return HttpResponse(status=403)
 
