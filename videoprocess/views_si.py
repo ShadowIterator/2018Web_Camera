@@ -35,8 +35,7 @@ def genCamera(fileName, sharedVar, recognizer):
     while(True):
         if(not vcap.opened):
             return
-
-
+        # print('--------')
         ret, frame = vcap.getCap().read()
 
         sharedVar.setImage(frame)
@@ -47,10 +46,7 @@ def genCamera(fileName, sharedVar, recognizer):
         if(tconsumers.web_skt is None):
             print('gen returned')
             return
-        # np_array = np.fromstring(frame, np.uint8)
-        # img_np=cv2.imdecode(np_array, cv2.IMREAD_COLOR)
 
-        # results = recognition.emotion_recognize(frame)
         results = sharedVar.res
 
         info_returned = ''
@@ -87,18 +83,17 @@ def mjpeg(request):
 
 def recognizer_function(sharedVar):
     while True:
+        # print('recognizing')
         sharedVar.setRes(recognition.emotion_recognize(sharedVar.img))
+        if(tconsumers.web_skt is None):
+            return
         time.sleep(0.05)
 
 def playVideo(request, fileName):
-    # cap = videocap.VideoCap(fileName)
-    # print('playVideo called')
-    # return StreamingHttpResponse(genCamera(cap), content_type='multipart/x-mixed-replace;boundary=myboundary')
+
     sharedVar = mp.sharedVar()
     recognizer = threading.Thread(target = recognizer_function, args = (sharedVar,))
 
-    # trd = threading.Thread(target = giveMsg, args = (0,))
-    # trd.start()
     return StreamingHttpResponse(genCamera(fileName, sharedVar, recognizer),  content_type='multipart/x-mixed-replace;boundary=myboundary')
 
 def releaseCap(request):
@@ -113,7 +108,6 @@ def giveMsg(x):
         time.sleep(0.7)
 
 def websocket(request):
-
     trd = threading.Thread(target = giveMsg, args = (0,))
     trd.start()
     return render(request, 'websocket.html',{})

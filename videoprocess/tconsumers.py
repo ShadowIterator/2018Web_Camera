@@ -1,4 +1,4 @@
 
 
 web_skt = None
-started = False
+status = False
