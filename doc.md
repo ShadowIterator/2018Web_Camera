@@ -54,8 +54,8 @@
 * 帧分析
 
   本次大作业进行分析的是视频中人物的面部表情，对应文件在recognition.py中。
-
-  * 首先利用cv2自带的截取功能将图像帧中的人脸截取出来（需要加载用于面部截取的文件haarcascade_frontalface_default.xml）。
+  * 分析任务在一个单独的线程进行，这个线程在请求视频时开启，在请求结束后关闭，与视频获取异步执行。
+  * 首先利用cv2自带的截取功能将图像帧中的人脸截取出来(需要加载用于面部截取的文件haarcascade_frontalface_default.xml）。
   * 利用keras加载一个已经训练好的人脸识别模型（来源：https://github.com/oarriaga/face_classification）对截取并处理过的人像图片进行表情的识别，并将模型的输出与标签对照得到分类结果。
   * 通过cv2将这一帧图像标识后返回。
 
