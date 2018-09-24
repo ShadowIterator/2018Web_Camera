@@ -6,9 +6,13 @@
 ## 环境
 * python 3.6.5
     - Django 2.1.1
+        - [LICENSE](https://github.com/django/django/blob/master/LICENSE)
     - Keras 2.2.2
+        - [LICENSE](https://github.com/keras-team/keras/blob/master/LICENSE)
     - tensorflow 1.10.0
+        -[LICENSE](https://github.com/tensorflow/tensorflow/blob/master/LICENSE)
     - channels 2.1.3
+        - [LICENSE](https://github.com/django/channels/blob/master/LICENSE)
     - opencv-python 3.4.3.18
 
 ## 功能点
@@ -67,3 +71,9 @@
         - 推送消息前进行判断，若分析的表情结果与上一次分析结果不同，或得到表情数大于一，则将表情信息推送至前端，并将信息与对应时间记录为一项存在数据库中。
         - 前端接到消息之后，把消息放到对应标签内。
 * 用户可以查看历史警示记录，可以删除选定的记录使其不再显示
+
+### 作者
+* 李仁杰
+    - 2016013271
+* 张佳麟
+    - 2016013256
